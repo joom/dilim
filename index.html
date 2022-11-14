@@ -1,0 +1,345 @@
+<!DOCTYPE html><html><head>
+    <meta charset="utf-8">
+    <title>dilim</title>
+    
+    <base href="/dilim/">
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <style>
+      @font-face {
+        font-family: 'loaded-iosevka';
+        src:  url('assets/iosevka-regular.woff2') format('woff2'),
+              url('assets/iosevka-regular.ttf') format('ttf');
+      }
+      body {
+        background: #eef8d7;
+      }
+      #wrapper {
+        padding-left: 1em;
+        padding-top: 3em;
+        font-family: Iosevka, 'loaded-iosevka', monospace;
+        font-size: 2em;
+        height: 50%;
+      }
+      .help {
+        font-family: Iosevka, 'loaded-iosevka', monospace;
+        padding: 1em;
+        margin: 1em;
+        font-size: 14px;
+        border: 1px solid black;
+        position: fixed;
+        bottom: 0;
+        height: 50%;
+        overflow-y: scroll;
+        background: #edfccc;
+      }
+      .help li {
+        margin-bottom: 10px;
+      }
+      /*
+      @media screen and (min-width: 600px) {
+        .help {
+          width: 80%;
+        }
+      }
+      */
+      .hole, .namehole {
+        border: 1px solid black;
+        width: 0.7em;
+        height: 1em;
+        background: white;
+        display: inline-block;
+        box-sizing: border-box;
+        position: relative;
+        top: 2px;
+      }
+      .hole > span, .namehole > span {
+        font-size: 0.4em;
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+      .var, .app, .lam, .defn, .while, .if, .ifelse, .term, .program, .const {
+        border: 1px solid black;
+        border-radius: 0.5em;
+        width: -moz-fit-content;
+        width: fit-content;
+        padding: 0.2em;
+        display: inline-block;
+        box-sizing: border-box;
+        color: #544908;
+      }
+      .program {
+        display: block;
+        background: #e5e9b0;
+        min-width: 30px;
+        min-height: 30px;
+      }
+      .lam {
+        color: #562222;
+      }
+      .stmt {
+        display: block !important;
+        margin-top:10px;
+        margin-bottom: 5px;
+      }
+      .stmt:first-of-type {
+        margin-top: 0px;
+      }
+      .defn {
+        color: #562222;
+        background: #fffeb5;
+      }
+      .term.stmt {
+        color: #562222;
+        background: #fffeb5;
+      }
+      .app > div {
+        margin-left: 0.2em;
+        margin-right: 0.2em;
+      }
+      .name {
+        display: inline-block;
+        box-sizing: border-box;
+        letter-spacing: -3px;
+        font-size: 0.9em;
+      }
+      .var {
+        background: #efff79;
+      }
+      .const {
+        background: #efff79;
+      }
+      .app {
+        background: #ffcc79;
+      }
+      .lam {
+        background: #f4e58e;
+      }
+      .if, .ifelse {
+        background: #fff0a2;
+      }
+      .while {
+        background: #eee0a2;
+      }
+      .lam::before, .lam > .bodyOuter > .lam.selected:before {
+        content: "λ";
+        color: brown;
+        text-shadow: 1px 1px #562222;
+      }
+      .defn::before, .defn > .bodyOuter > .defn.selected:before {
+        content: "let";
+        color: brown;
+        text-shadow: 1px 1px #562222;
+        font-size: 0.9em;
+        margin-right: 5px;
+      }
+      /*
+      .defn > .name::after, .lam > .namehole::after{
+        content: ".";
+      }
+      */
+      .nameOuter, .bodyOuter, .defnBodyOuter {
+        display: inline-block;
+      }
+      .nameOuter {
+        margin-left: 0.2em;
+        margin-right: 0.2em;
+      }
+      .bodyOuter.bodyOuterLast::before {
+        content: ".";
+        color: brown;
+        text-shadow: 1px 1px #562222;
+      }
+      .selected > .bodyOuter::before {
+        content: ".";
+        color: brown;
+        text-shadow: 1px 1px #562222;
+      }
+      .defnBodyOuter::before {
+        content: "=";
+        color: brown;
+        text-shadow: 1px 1px #562222;
+        font-size: 0.9em;
+        margin-left: 3px;
+        margin-right: 8px;
+      }
+      .condOuter::before {
+        content: "if";
+        color: brown;
+        text-shadow: 1px 1px #562222;
+        margin-right: 10px;
+      }
+      .ifBodyOuter::after {
+        content: "";
+        color: brown;
+        text-shadow: 1px 1px #562222;
+      }
+      .ifelse > .ifBodyOuter::after {
+        content: "else" !important;
+      }
+      .ifelse > .ifBodyOuter:last-of-type::after {
+        content: "" !important;
+      }
+      .ifBodyOuter > div {
+        margin-left: 42px;
+        margin-top: 5px;
+      }
+
+      .while > .condOuter::before {
+        content: "while";
+        color: brown;
+        text-shadow: 1px 1px #562222;
+        margin-right: 10px;
+      }
+      .whileBodyOuter > div {
+        margin-left: 42px;
+        margin-top: 5px;
+      }
+
+      /*
+      .lam > .bodyOuter > .lam::before {
+        content: "\00a0";
+      }
+      */
+      .lam > .bodyOuter > .lam {
+        padding: 0em;
+        border: 0;
+        margin: 0;
+      }
+      .app > .app:first-child {
+        padding: 0em;
+        border: 0;
+        margin: 0;
+      }
+      .selected {
+        border: 2px solid red !important;
+      }
+      .hovered {
+        border: 1px dashed black !important;
+      }
+      .selected.hovered {
+        border: 2px solid red !important;
+      }
+      .app > .app.selected,
+      .lam > .bodyOuter > .lam.selected {
+        margin-left: 0.1em;
+        margin-right: 0.1em;
+        padding: 0.2em;
+      }
+      #header {
+          position: fixed;
+          height: 20px;
+          background-color: #6941e1;
+          color: white;
+          top: 0px;
+          left: 0px;
+          right: 0px;
+          margin-top: 0px;
+          padding: 10px;
+          font-family: Iosevka, 'loaded-iosevka', monospace;
+          font-size: 1em;
+      }
+      #error {
+          position: fixed;
+          height: 20px;
+          background-color: #b9e141;
+          /*
+          color: #e16941;
+          color: #6941e1;
+          font-weight: bold;
+          */
+          color: #e14141;
+          top: 40px;
+          left: 0px;
+          right: 0px;
+          margin-top: 0px;
+          padding: 10px;
+          font-family: Iosevka, 'loaded-iosevka', monospace;
+          font-size: 1em;
+          border-bottom: 1px solid black;
+      }
+      .dilim {
+          color: #6941e1;
+          font-weight: bold;
+      }
+      .normal {
+          color: black;
+      }
+      #header .left { 
+        list-style: none; 
+        padding: 0; 
+        margin: 0;
+        display: inline-block;
+      }
+      #header .right {
+        float: right;
+      }
+      #header span { display: inline; white-space: nowrap; }
+
+    kbd {
+      border: 2px solid black; 
+      box-shadow: 2px 2px black; 
+      color: black;
+      background: #83ebd1;
+      font-size: .85em; 
+      line-height: .85em; 
+      display: inline-block;
+      font-weight: normal;
+      padding: 3px 5px;
+      white-space: nowrap;
+      border-radius: 5px;
+      font-family: Iosevka, 'loaded-iosevka', monospace;
+    }
+    .kbdsequence > kbd {
+      margin-right: 5px;
+    }
+    .help .kbdsequence > kbd:last-of-type {
+      margin-right: 0px;
+    }
+    .suggestions {
+      opacity: 0.4;
+    }
+    kbd.usual::first-letter {
+      font-weight: bold;
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+    }
+    kbd.text {
+      background: #eee;
+    }
+    kbd.number {
+      background: #e1aff2;
+    }
+    kbd.done {
+      background: #b9e141;
+    }
+    kbd.failed {
+      border: 2px solid #b8441d; 
+      background: #e16941;
+      color: white;
+    }
+    kbd.failed:before {
+      content: "×";
+    }
+    kbd.done:before {
+      content: "✔️";
+    }
+    </style>
+    <script>
+      function save(content, fileName) {
+        let pom = document.createElement('a')
+        pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content))
+        pom.setAttribute('download', fileName)
+        pom.click()
+      }
+      function read() {
+        let input = document.createElement('input');
+        input.setAttribute("type", "file")
+        input.click()
+      }
+    </script>
+  
+<link rel="preload" href="/dilim/yew-app-2b27709005299894_bg.wasm" as="fetch" type="application/wasm" crossorigin="">
+<link rel="modulepreload" href="/dilim/yew-app-2b27709005299894.js"></head>
+<body>
+<script type="module">import init from '/dilim/yew-app-2b27709005299894.js';init('/dilim/yew-app-2b27709005299894_bg.wasm');</script></body></html>
