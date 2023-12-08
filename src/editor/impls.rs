@@ -91,6 +91,13 @@ impl Term {
             }
         }
     }
+
+
+    fn simplify(t : R<Self>) -> Term {
+        match &*t.borrow_mut() {
+            e => e.clone()
+        }
+    }
 }
 
 impl Stmt {
@@ -197,7 +204,7 @@ impl std::ops::Deref for Cmds {
 }
 
 impl App {
-    pub fn complete_command(keys: Vec<Cmd>) -> Vec<Cmd> {
+    pub fn complete_command(&self, keys: Vec<Cmd>) -> Vec<Cmd> {
         match &keys[..] {
             [] => vec![
                 Cmd::Help,
@@ -210,19 +217,30 @@ impl App {
                 Cmd::Paste,
             ],
             [Cmd::Wrap] => vec![Cmd::App, Cmd::Lam, Cmd::Defn],
-            [Cmd::Add] => vec![
-                Cmd::App,
-                Cmd::Lam,
-                Cmd::Var,
-                Cmd::Constant,
-                Cmd::Defn,
-                Cmd::Term,
-                Cmd::Statement,
-                Cmd::Fresh,
-                // Cmd::While,
-                // Cmd::If,
-                // Cmd::Else,
-            ],
+            [Cmd::Add] => 
+                match &self.selected {
+                    None => vec![],
+                    Some(Selection::SName(_)) =>
+                        vec![Cmd::Fresh],
+                    Some(Selection::STerm(_)) =>
+                        vec![
+                            Cmd::App,
+                            Cmd::Lam,
+                            Cmd::Var,
+                            Cmd::Constant
+                        ],
+                    Some(Selection::SStmt(_)) =>
+                        vec![
+                            Cmd::Defn,
+                            Cmd::Term,
+                            Cmd::Statement,
+                            Cmd::While,
+                            Cmd::If,
+                            Cmd::Else
+                        ],
+                    Some(Selection::SProgram(_)) =>
+                        vec![Cmd::Statement]
+                }
             [Cmd::Add, Cmd::Constant] => vec![Cmd::True, Cmd::False, Cmd::Number(0)],
             [Cmd::Delete] => vec![],
             [Cmd::Go] => vec![

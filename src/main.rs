@@ -96,7 +96,7 @@ impl Component for App {
                                 self.page = Page::Main;
                             }
                             9 /* tab */ => {
-                                self.suggestions = App::complete_command(keys);
+                                self.suggestions = self.complete_command(keys);
                             }
                             13 /* enter */ => {
                                 self.keys.push(Cmd::Enter);
@@ -116,7 +116,7 @@ impl Component for App {
                                 return true;
                             }
                             _ => {
-                                let options = App::complete_command(keys);
+                                let options = self.complete_command(keys);
                                 for cmd in options {
                                     match cmd {
                                         Cmd::Number(_) => { continue; }
